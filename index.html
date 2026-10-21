@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>優しい人の、優しくない恋 — 深夜の会議室</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="game-container">
+    <!-- Title Screen -->
+    <section id="title-screen" class="screen active">
+      <div class="title-backdrop">
+        <div class="city-lights"></div>
+      </div>
+      <div class="title-content">
+        <div class="tagline">優しさを、数字と設計で守る恋</div>
+        <h1 class="main-title">優しい人の、<br><span class="highlight">優しくない恋</span></h1>
+        <p class="sub-title">Episode 4.5: 深夜の会議室 —「火を持って帰る日」</p>
+        
+        <div class="title-character-preview">
+          <img src="assets/images/hero.png" alt="笹塚怜" class="title-hero-img">
+        </div>
+
+        <div class="title-actions">
+          <button id="btn-start" class="btn primary">物語を始める</button>
+          <button id="btn-about" class="btn secondary">作品・キャラクター</button>
+        </div>
+        <div class="sound-prompt">※ 音声（BGM・SE）をオンにしてお楽しみいただけます</div>
+      </div>
+    </section>
+
+    <!-- Main Stage Screen -->
+    <section id="stage-screen" class="screen">
+      <div id="stage-bg" class="stage-bg midnight-meeting">
+        <div class="window-glare"></div>
+        <div class="dust-particles"></div>
+      </div>
+
+      <!-- Character Stage -->
+      <div id="character-stage">
+        <div id="hero-sprite-container" class="sprite-wrapper hero-wrapper hidden">
+          <img id="hero-sprite" src="assets/images/hero.png" alt="笹塚怜" class="character-sprite">
+          <div class="sprite-shadow"></div>
+        </div>
+      </div>
+
+      <!-- Header Controls -->
+      <header id="game-header">
+        <div class="header-left">
+          <span class="chapter-tag">第4章 後半</span>
+          <span class="scene-name">深夜23時の会議室</span>
+        </div>
+        <div class="header-right">
+          <div class="affection-meter" title="怜との共鳴度">
+            <span class="heart-icon">♥</span>
+            <div class="meter-bar-outer"><div id="meter-bar" class="meter-bar-inner" style="width: 30%;"></div></div>
+            <span id="meter-value" class="meter-text">30</span>
+          </div>
+          <button id="btn-sound" class="icon-btn" title="サウンド切替">🔊</button>
+          <button id="btn-auto" class="icon-btn text-icon">AUTO</button>
+          <button id="btn-log" class="icon-btn text-icon">LOG</button>
+        </div>
+      </header>
+
+      <!-- Message Box -->
+      <div id="dialogue-container">
+        <div class="dialogue-box">
+          <div class="speaker-header">
+            <span id="speaker-name" class="speaker-badge"></span>
+            <div id="speaker-avatar" class="speaker-avatar-wrap hidden">
+              <img id="avatar-img" src="assets/images/heroine_face.png" alt="avatar">
+            </div>
+          </div>
+          <div id="dialogue-text-wrapper">
+            <p id="dialogue-text" class="dialogue-text"></p>
+            <span id="click-indicator" class="click-indicator animate-pulse">▼</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Choice Overlay -->
+      <div id="choice-overlay" class="choice-overlay hidden">
+        <div class="choice-panel">
+          <p class="choice-prompt">瑞希の返答・選択：</p>
+          <div id="choices-list" class="choices-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Epilogue Screen -->
+    <section id="epilogue-screen" class="screen">
+      <div class="epilogue-card">
+        <span class="epilogue-tag">CHAPTER CLEAR</span>
+        <h2 id="epilogue-title">火を持って帰る夜</h2>
+        <div class="epilogue-quote">
+          <blockquote id="epilogue-quote-text">
+            「君の代わりに答えるためじゃない。<br>君が自分で答えるための準備を、隣でするだけ」
+          </blockquote>
+          <cite>— 笹塚 怜</cite>
+        </div>
+        <div class="epilogue-stats">
+          <div class="stat-item">
+            <span class="stat-label">笹塚怜との共鳴度</span>
+            <span id="final-affection" class="stat-val">85%</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">辿り着いた関係性</span>
+            <span id="final-relationship" class="stat-val highlight">対等な伴走者</span>
+          </div>
+        </div>
+        <p id="epilogue-desc" class="epilogue-desc">
+          守られるだけじゃない。君が自分の足で立ち、明日の答えを自分で見つけるための準備を、怜は静かに隣で引き受けてくれた。
+        </p>
+        <div class="epilogue-actions">
+          <button id="btn-restart" class="btn primary">もう一度プレイする</button>
+          <a href="https://github.com/Otomelab/yasakoi" target="_blank" class="btn secondary">原作リポジトリ（yasakoi）を見る</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Backlog Modal -->
+    <div id="log-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>バックログ（会話履歴）</h3>
+          <button id="btn-close-log" class="close-btn">×</button>
+        </div>
+        <div id="log-list" class="log-body"></div>
+      </div>
+    </div>
+
+    <!-- About Modal -->
+    <div id="about-modal" class="modal hidden">
+      <div class="modal-content about-content">
+        <div class="modal-header">
+          <h3>作品・キャラクター紹介</h3>
+          <button id="btn-close-about" class="close-btn">×</button>
+        </div>
+        <div class="modal-body scrollable">
+          <div class="char-intro-card">
+            <img src="assets/images/hero.png" class="intro-char-thumb">
+            <div>
+              <h4>笹塚 怜（Sasazuka Rei）</h4>
+              <p class="char-role">テクニカルディレクター／30歳</p>
+              <p class="char-desc">物静かで理性的。長髪を緩く結んでいる。技術と数字で守る優しさを持つが、過去の傷から時に先回りして答えを奪ってしまう危うさも抱える。</p>
+            </div>
+          </div>
+          <div class="char-intro-card">
+            <img src="assets/images/heroine_face.png" class="intro-char-thumb">
+            <div>
+              <h4>花園 瑞希（Hanazono Mizuki）</h4>
+              <p class="char-role">プロダクト企画／25歳（主人公）</p>
+              <p class="char-desc">文具・ライフスタイルブランド「HARENIWA」の企画。優しさに甘えず、自分の力で強くなりたいと願う芯の強さを持つ。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
