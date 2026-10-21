@@ -1,4 +1,3 @@
-
 // 優しさの、優しくない恋 — Web Novel Engine
 // Episode 4.5: 深夜の会議室「火を持って帰る日」
 
@@ -42,7 +41,7 @@ const SCENARIO_DATA = [
   {
     speaker: "",
     type: "monologue",
-    text: "背後からふいに声がして、肩が大きく跳ねた。振り向くと、笹塚怜が入り口に立っていた。",
+    text: "背後からふいに声がして、肩が大きく跳ねた。振り返ると、笹塚怜が入り口に立っていた。",
     heroVisible: true
   },
   {
@@ -444,6 +443,7 @@ class Game {
       speakerAvatar: document.getElementById('speaker-avatar'),
       dialogueText: document.getElementById('dialogue-text'),
       dialogueBox: document.querySelector('.dialogue-box'),
+      dialogueContainer: document.getElementById('dialogue-container'),
       choiceOverlay: document.getElementById('choice-overlay'),
       choicesList: document.getElementById('choices-list'),
       meterBar: document.getElementById('meter-bar'),
@@ -462,24 +462,33 @@ class Game {
   }
 
   initEvents() {
-    this.dom.btnStart.addEventListener('click', () => this.startGame());
-    this.dom.btnRestart.addEventListener('click', () => this.restartGame());
-    this.dom.btnAbout.addEventListener('click', () => this.dom.aboutModal.classList.remove('hidden'));
-    this.dom.btnCloseAbout.addEventListener('click', () => this.dom.aboutModal.classList.add('hidden'));
-    
-    this.dom.dialogueBox.addEventListener('click', () => {
-      if (!this.dom.choiceOverlay.classList.contains('hidden')) return;
-      this.next();
-    });
+    const bindAction = (elem, fn) => {
+      if (!elem) return;
+      elem.addEventListener('click', (e) => { e.preventDefault(); fn(e); });
+      elem.addEventListener('touchend', (e) => { e.preventDefault(); fn(e); });
+    };
 
-    this.dom.btnAuto.addEventListener('click', () => this.toggleAuto());
-    this.dom.btnSound.addEventListener('click', () => this.toggleSound());
-    this.dom.btnLog.addEventListener('click', () => this.showLog());
-    this.dom.btnCloseLog.addEventListener('click', () => this.dom.logModal.classList.add('hidden'));
+    bindAction(this.dom.btnStart, () => this.startGame());
+    bindAction(this.dom.btnRestart, () => this.restartGame());
+    bindAction(this.dom.btnAbout, () => this.dom.aboutModal.classList.remove('hidden'));
+    bindAction(this.dom.btnCloseAbout, () => this.dom.aboutModal.classList.add('hidden'));
+    
+    // Tap anywhere on the stage or dialogue box to advance
+    const advanceHandler = (e) => {
+      if (!this.dom.choiceOverlay.classList.contains('hidden')) return;
+      if (e.target.closest('#game-header') || e.target.closest('.modal')) return;
+      this.next();
+    };
+    this.dom.stageScreen.addEventListener('click', advanceHandler);
+
+    bindAction(this.dom.btnAuto, (e) => { e.stopPropagation(); this.toggleAuto(); });
+    bindAction(this.dom.btnSound, (e) => { e.stopPropagation(); this.toggleSound(); });
+    bindAction(this.dom.btnLog, (e) => { e.stopPropagation(); this.showLog(); });
+    bindAction(this.dom.btnCloseLog, (e) => { e.stopPropagation(); this.dom.logModal.classList.add('hidden'); });
   }
 
   startGame() {
-    this.initAudio();
+    try { this.initAudio(); } catch(e) { console.warn('Audio init bypassed:', e); }
     this.dom.titleScreen.classList.remove('active');
     this.dom.stageScreen.classList.add('active');
     this.step = 0;
@@ -506,6 +515,9 @@ class Game {
         this.audioCtx = new AudioContext();
       }
     }
+    if (this.audioCtx && this.audioCtx.state === 'suspended') {
+      this.audioCtx.resume().catch(() => {});
+    }
   }
 
   playBip(freq = 440, dur = 0.08) {
@@ -525,7 +537,7 @@ class Game {
   }
 
   toggleSound() {
-    this.initAudio();
+    try { this.initAudio(); } catch(e) {}
     this.soundEnabled = !this.soundEnabled;
     this.dom.btnSound.textContent = this.soundEnabled ? '🔊' : '🔈';
     if (this.soundEnabled) this.playBip(587, 0.15);
@@ -615,8 +627,9 @@ class Game {
       const btn = document.createElement('button');
       btn.className = 'choice-btn';
       btn.textContent = opt.text;
-      btn.addEventListener('click', (e) => {
+      const onSelect = (e) => {
         e.stopPropagation();
+        e.preventDefault();
         this.affection = Math.min(100, Math.max(0, this.affection + opt.affectionDelta));
         this.updateMeter();
         this.history.push({ speaker: '瑞希（選択）', text: opt.text });
@@ -624,7 +637,9 @@ class Game {
         this.dom.choiceOverlay.classList.add('hidden');
         this.step++;
         this.render();
-      });
+      };
+      btn.addEventListener('click', onSelect);
+      btn.addEventListener('touchend', onSelect);
       this.dom.choicesList.appendChild(btn);
     });
   }
